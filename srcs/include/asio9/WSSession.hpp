@@ -15,10 +15,9 @@ namespace asio9 {
 	{
 	public:
 		WebSocketSession(basic_type::io_type* io, basic_type::socket_type socket)
-			: m_ws(std::move(socket))//初始化TCP流
+			: m_ws(std::move(socket))//初始化WebSocket流
 		{
 			this->m_io = io;
-			this->m_socket = &socket;
 		};
 		~WebSocketSession() {
 
@@ -43,7 +42,7 @@ namespace asio9 {
 
 		//获取一些东西
 		inline boost::beast::websocket::stream<boost::beast::tcp_stream>* getWSStreamPtr() { return &this->m_ws; }
-		inline basic_type::socket_type* getSocketPtr() { return this->m_socket; }
+		inline boost::beast::tcp_stream* getTcpStreamPtr() { return &this->m_ws.next_layer(); }
 		inline basic_type::io_type* getIo_context() { return this->m_io; };
 
 		virtual void init() {}
@@ -95,7 +94,6 @@ namespace asio9 {
 		}
 
 		basic_type::io_type* m_io = nullptr;
-		basic_type::socket_type* m_socket = nullptr;
 		boost::beast::websocket::stream<boost::beast::tcp_stream> m_ws;
 		boost::beast::flat_buffer m_buffer;
 	};

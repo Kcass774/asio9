@@ -42,7 +42,9 @@ public:
 	}
 
 	void on_accept(asio9::basic_type::ec_type ec, session_ptr session) {
-		//cout << "新连接:" << session->getSocketPtr()->remote_endpoint() << endl;
+		if (ec)
+			cerr << ec.message() << endl;
+		cout << "新连接:" << session->getTcpStreamPtr()->socket().remote_endpoint() << endl;
 	};
 };
 
