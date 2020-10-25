@@ -40,6 +40,13 @@ namespace asio9 {
 					this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 		};
 
+		//读取请求
+		void do_read() {
+			this->m_ws.async_read(
+				this->m_buffer,
+				std::bind(&WebSocketSession::read_handler, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+		}
+
 		//获取一些东西
 		inline boost::beast::websocket::stream<boost::beast::tcp_stream>* getWSStreamPtr() { return &this->m_ws; }
 		inline boost::beast::tcp_stream* getTcpStreamPtr() { return &this->m_ws.next_layer(); }
@@ -68,13 +75,6 @@ namespace asio9 {
 			do_read();
 		}
 
-		//读取请求
-		void do_read() {
-			this->m_ws.async_read(
-				this->m_buffer,
-				std::bind(&WebSocketSession::read_handler, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
-		}
-
 		//关闭连接
 		inline void do_close() {  };
 
@@ -85,12 +85,13 @@ namespace asio9 {
 			if (ec == boost::beast::websocket::error::closed)
 				return;
 
-			if (this->m_ws.got_text())
-				this->on_message(this->shared_from_this(), (char*)this->m_buffer.data().data(), bytes_transferred);
-			else
-				this->on_message(this->shared_from_this(), nullptr, bytes_transferred);
-
-			this->do_read();
+			if (!ec) {
+				if (this->m_ws.got_text())
+					this->on_message(this->shared_from_this(), (char*)this->m_buffer.data().data(), bytes_transferred);
+				else
+					this->on_message(this->shared_from_this(), nullptr, 0);
+				this->do_read();
+			}
 		}
 
 		basic_type::io_type* m_io = nullptr;

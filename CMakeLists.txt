@@ -20,6 +20,8 @@ add_executable(tcp_server "srcs/test/tcpserver.cpp")
 add_executable(http_server "srcs/test/httpserver.cpp")
 add_executable(tcp_client "srcs/test/tcpclient.cpp")
 add_executable(websocket_server "srcs/test/websocketserver.cpp")
+add_executable(websocket_client "srcs/test/websocketclient.cpp")
+
 
 if(NOT Boost_FOUND)
     message("Not found Boost")
