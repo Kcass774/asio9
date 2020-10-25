@@ -48,17 +48,17 @@ namespace asio9 {
 		inline basic_type::io_type* getIo_context() { return this->m_io; };
 
 		//关闭连接
-		inline void Close() {
+		inline void close() {
 			this->m_io->post([this]() {
 				this->m_socket.close();
 				});
 		}
 
 		//发送数据
-		inline void Write(const char* data, const size_t size) {
+		inline void write(const char* data, const size_t size) {
 			this->m_socket.async_write_some(boost::asio::buffer(data, size),
-				std::bind(&asio9::TcpSession::write_handler, this,
-					std::placeholders::_1, std::placeholders::_2));
+				std::bind(&asio9::TcpSession::after_write, this->shared_from_this(),
+					this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 		}
 
 		//使用malloc分配内存作为缓存区
@@ -89,10 +89,6 @@ namespace asio9 {
 			this->m_socket.async_read_some(boost::asio::buffer(m_buf, this->m_bufsize),
 				std::bind(&asio9::TcpSession::read_handler, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 		};
-
-		void write_handler(const boost::system::error_code& ec, size_t length) {
-			this->after_write(this->shared_from_this(), ec, length);
-		}
 
 		void read_handler(const boost::system::error_code& ec, size_t length) {
 			if (ec.value() == boost::asio::error::eof)//服务器主动断开连接

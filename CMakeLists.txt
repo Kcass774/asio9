@@ -16,10 +16,10 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srcs/include)
 
-aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/srcs/include/asio9/. ASIO9_SRCS)
-add_executable(tcp_server "srcs/test/tcpserver.cpp" ${ASIO9_SRCS})
-add_executable(http_server "srcs/test/httpserver.cpp" ${ASIO9_SRCS})
-add_executable(tcp_client "srcs/test/tcpclient.cpp" ${ASIO9_SRCS})
+add_executable(tcp_server "srcs/test/tcpserver.cpp")
+add_executable(http_server "srcs/test/httpserver.cpp")
+add_executable(tcp_client "srcs/test/tcpclient.cpp")
+add_executable(websocket_server "srcs/test/websocketserver.cpp")
 
 if(NOT Boost_FOUND)
     message("Not found Boost")

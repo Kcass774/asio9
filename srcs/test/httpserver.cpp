@@ -8,6 +8,8 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+
+
 class session : public asio9::HttpSession {
 public:
 	session(asio9::basic_type::io_type* io, asio9::basic_type::socket_type socket)
@@ -29,7 +31,7 @@ public:
 
 	void after_write(std::shared_ptr<HttpSession> session, const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
-		cout << "已传输" << size << "Bytes" << endl;
+		//cout << "已传输" << size << "Bytes" << endl;
 	}
 };
 
@@ -41,7 +43,7 @@ public:
 	}
 
 	void on_accept(asio9::basic_type::ec_type ec, session_ptr session) {
-		cout << "新连接:" << session->getTcpStreamPtr()->socket().remote_endpoint() << endl;
+		//cout << "新连接:" << session->getTcpStreamPtr()->socket().remote_endpoint() << endl;
 	};
 };
 

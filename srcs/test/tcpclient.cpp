@@ -33,7 +33,7 @@ public:
 	void on_message(std::shared_ptr<TcpSession> this_ptr, const char* data, const size_t& size)
 	{
 		cout << "接收数据:" << std::string_view(data, size) << endl;
-		this->Write("NihaoShijie", 11);
+		this->write("NihaoShijie", 11);
 	}
 
 	void after_write(std::shared_ptr<TcpSession> this_ptr, const asio9::basic_type::ec_type& ec, const size_t& size)

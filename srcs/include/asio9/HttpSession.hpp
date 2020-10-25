@@ -44,7 +44,8 @@ namespace asio9 {
 			boost::beast::http::async_write(
 				this->m_stream,
 				*res,
-				std::bind(&HttpSession::write_handler, this->shared_from_this(), std::placeholders::_1, std::placeholders::_2, res));
+				std::bind(&HttpSession::after_write, this->shared_from_this(),
+					this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 		};
 
 		//获取一些东西
@@ -60,7 +61,7 @@ namespace asio9 {
 
 	private:
 		//读取请求
-		inline void do_read() {
+		void do_read() {
 			//初始化请求
 			basic_type::req_ptr req = std::make_shared<basic_type::req_type>();
 
@@ -80,10 +81,6 @@ namespace asio9 {
 				//读取下一个请求
 				do_read();
 			}
-		}
-		void write_handler(basic_type::ec_type ec, size_t bytes_transferred, basic_type::res_ptr& res)
-		{
-			this->after_write(this->shared_from_this(), ec, bytes_transferred);
 		}
 
 		basic_type::io_type* m_io = nullptr;
