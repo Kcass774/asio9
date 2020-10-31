@@ -1,8 +1,10 @@
 #include <iostream>
+#include <chrono>
 #include <string>
 
 #include <asio9/HttpSession.hpp>
 #include <asio9/TcpServer.hpp>
+#include <asio9/HttpParse.hpp>
 
 using std::cerr;
 using std::cout;
@@ -20,11 +22,33 @@ public:
 
 	void on_message(const asio9::basic_type::ec_type& ec, size_t bytes_transferred, asio9::basic_type::req_ptr req)
 	{
+		auto start = std::chrono::system_clock::now();
+
+		auto target = req->target();
+		auto pTarget = asio9::parse_url(target);
+		auto pVar = asio9::parse_urlvar(pTarget.second);
+
 		auto res = std::make_shared<asio9::basic_type::res_type>(boost::beast::http::status::ok, req->version());
 		res->set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
 		res->set(boost::beast::http::field::content_type, "text/html");
 		res->keep_alive(req->keep_alive());
-		res->body() = "Hello World!";
+		std::string body = "Target: ";
+		body += pTarget.first;
+		body += "\nVar:\n";
+		for (auto iter = pVar.begin(); iter != pVar.end(); iter++) {
+			body += '\t';
+			body += iter->first;
+			body += ": ";
+			body += iter->second;
+			body += '\n';
+		}
+
+		auto end = std::chrono::system_clock::now();
+		body += "Time: ";
+		body += std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
+		body += " ms\n";
+
+		res->body() = std::move(body);
 		res->prepare_payload();
 		this->write(res);
 	}

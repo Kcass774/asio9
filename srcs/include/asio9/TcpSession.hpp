@@ -3,9 +3,7 @@
 
 #include <memory>
 
-#include <boost/pool/pool.hpp>
 #include <boost/asio.hpp>
-#include <boost/beast.hpp>
 
 namespace asio9 {
 	class TcpSession;
