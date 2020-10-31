@@ -22,23 +22,42 @@ public:
 
 	}
 
-	void on_connected(std::shared_ptr<TcpSession> this_ptr, const asio9::basic_type::ec_type& ec) {
-		cout << "è¿žæŽ¥æˆåŠŸ" << endl;
+	void on_connected(const asio9::basic_type::ec_type& ec) {
+		if (ec) {
+			cerr << ec.message() << endl;
+		}
+		else {
+			cout << "Á¬½Ó³É¹¦" << endl;
+		}
 	}
 
-	void on_close(std::shared_ptr<TcpSession> this_ptr) {
-		cout << "è¿žæŽ¥ä¸¢å¤±" << endl;
+	void on_close() {
+		cout << "Á¬½Ó¶ªÊ§" << endl;
 	}
 
-	void on_message(std::shared_ptr<TcpSession> this_ptr, const char* data, const size_t& size)
+	void on_readready(const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
-		cout << "æŽ¥æ”¶æ•°æ®:" << std::string_view(data, size) << endl;
-		this->write("NihaoShijie", 11);
+		if (ec) {
+			cerr << ec.message() << endl;
+		}
+		else {
+			auto buf = this->get_streambuf();
+			auto view = std::string_view((char*)buf->data().data(), buf->size());
+			cout << "»º³åÇø:" << view << endl;
+			if (buf->size() > 10)
+				buf->consume(10);
+			this->write("NihaoShijie", 11);
+		}
 	}
 
-	void after_write(std::shared_ptr<TcpSession> this_ptr, const asio9::basic_type::ec_type& ec, const size_t& size)
+	void on_write(const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
-		//cout << "å·²ä¼ è¾“" << size << "Bytes" << endl;
+		if (ec) {
+			cerr << ec.message() << endl;
+		}
+		else {
+			cout << "ÒÑ´«Êä" << size << "Bytes" << endl;
+		}
 	}
 };
 
@@ -47,7 +66,6 @@ void CreateClient() {
 
 	auto client = std::make_shared<customclient>(&io);
 	asio9::basic_type::endpoint_type endpoint(boost::asio::ip::make_address("127.0.0.1"), 8888);
-	client->initBuffer(4096);
 	client->run(endpoint);
 }
 

@@ -22,23 +22,27 @@ public:
 
 	}
 
-	void on_connected(std::shared_ptr<WebSocketClient> this_ptr, const asio9::basic_type::ec_type& ec) {
+	void on_connected(const asio9::basic_type::ec_type& ec) {
 		cout << "连接成功" << endl;
-		this->getWSStreamPtr()->text(true);
+		this->get_websocket_stream()->text(true);
 		this->write("NihaoShijie", 11);
 	}
 
-	void on_close(std::shared_ptr<WebSocketSession> this_ptr) {
+	void on_close() {
 		cout << "连接丢失" << endl;
 	}
 
-	void on_message(std::shared_ptr<WebSocketSession> this_ptr, const char* data, const size_t& size)
+	void on_message(const asio9::basic_type::ec_type& ec, const char* data, const size_t& size)
 	{
-		cout << "接收数据:" << std::string_view(data, size) << endl;
-		this->write("NihaoShijie", 11);
+		if (ec)
+			cerr << ec.message() << endl;
+		else {
+			cout << "接收数据:" << std::string_view(data, size) << endl;
+			this->write("NihaoShijie", 11);
+		}
 	}
 
-	void after_write(std::shared_ptr<WebSocketSession> this_ptr, const asio9::basic_type::ec_type& ec, const size_t& size)
+	void on_write(const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
 		cout << "已传输" << size << "Bytes" << endl;
 	}
@@ -48,7 +52,7 @@ void CreateClient() {
 	boost::pool<> pool(sizeof(char) * 4000);
 
 	auto client = std::make_shared<customclient>(&io);
-	asio9::basic_type::endpoint_type endpoint(boost::asio::ip::make_address("127.0.0.1"), 8880);
+	asio9::basic_type::endpoint_type endpoint(boost::asio::ip::make_address("127.0.0.1"), 8801);
 	client->run(endpoint, "localhost", "/");
 }
 

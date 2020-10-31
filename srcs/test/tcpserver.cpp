@@ -20,24 +20,33 @@ public:
 
 	}
 
-	void init() {
-		this->initBuffer(1024);
-	}
-
-	void on_close(std::shared_ptr<TcpSession> this_ptr) {
+	void on_close() {
 		cout << "连接丢失" << endl;
 	}
 
-	void on_message(std::shared_ptr<TcpSession> this_ptr, const char* data, const size_t& size)
+	void on_readready(const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
-		cout << "接收数据:" << std::string_view(data, size) << endl;
-
-		this->write("NihaoShijie", 11);
+		if (ec) {
+			cerr << ec.message() << endl;
+		}
+		else {
+			auto buf = this->get_streambuf();
+			auto view = std::string_view((char*)buf->data().data(), buf->size());
+			cout << "缓冲区:" << view << endl;
+			if (buf->size() > 10)
+				buf->consume(10);
+			this->write("NihaoShijie", 11);
+		}
 	}
 
-	void after_write(std::shared_ptr<TcpSession> this_ptr, const asio9::basic_type::ec_type& ec, const size_t& size)
+	void on_write(const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
-		cout << "已传输" << size << "Bytes" << endl;
+		if (ec) {
+			cerr << ec.message() << endl;
+		}
+		else {
+			cout << "已传输" << size << "Bytes" << endl;
+		}
 	}
 };
 
@@ -52,7 +61,7 @@ public:
 		if (ec)
 			cerr << ec;
 		else
-			cout << "新连接:" << session->getSocketPtr()->remote_endpoint() << endl;
+			cout << "新连接:" << session->get_socket()->remote_endpoint() << endl;
 	}
 };
 

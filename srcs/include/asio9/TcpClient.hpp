@@ -13,20 +13,20 @@ namespace asio9 {
 		}
 
 		void run(const asio9::basic_type::endpoint_type& endpoint) {
-			this->getIo_context()->dispatch(std::bind(&TcpClient::do_connect, std::dynamic_pointer_cast<TcpClient>(TcpSession::shared_from_this()), endpoint));
+			this->get_executor().context().dispatch(std::bind(&TcpClient::do_connect, std::dynamic_pointer_cast<TcpClient>(TcpSession::shared_from_this()), endpoint));
 		}
 
-		virtual void on_connected(std::shared_ptr<TcpSession> this_ptr, const basic_type::ec_type& ec) {}
+		virtual void on_connected(const basic_type::ec_type& ec) {}
 
 	private:
 		void do_connect(const asio9::basic_type::endpoint_type& endpoint) {
-			this->getSocketPtr()->async_connect(endpoint,
+			this->get_socket()->async_connect(endpoint,
 				std::bind(&TcpClient::conn_handler, std::dynamic_pointer_cast<TcpClient>(TcpSession::shared_from_this()), std::placeholders::_1));
 		};
 
 		void conn_handler(const boost::system::error_code& ec)
 		{
-			this->on_connected(std::dynamic_pointer_cast<TcpClient>(TcpSession::shared_from_this()), ec);
+			this->on_connected(ec);
 			TcpSession::run();
 		}
 	};

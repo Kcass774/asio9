@@ -16,19 +16,22 @@ public:
 
 	}
 
-	void on_accept(std::shared_ptr<WebSocketSession> session, asio9::basic_type::ec_type ec) {
+	void on_accept(const asio9::basic_type::ec_type& ec) {
 		if (ec)
 			cerr << ec.message() << endl;
 	};
 
-	void on_message(std::shared_ptr<WebSocketSession> session, const char* data, const size_t& size)
+	void on_message(const asio9::basic_type::ec_type& ec, const char* data, const size_t& size)
 	{
-		cout << "接收数据:" << std::string_view(data, size) << endl;
-
-		this->write("NihaoShijie", 11);
+		if (ec)
+			cerr << ec.message() << endl;
+		else {
+			cout << "接收数据:" << std::string_view(data, size) << endl;
+			this->write("NihaoShijie", 11);
+		}
 	}
 
-	void after_write(std::shared_ptr<WebSocketSession> session, const asio9::basic_type::ec_type& ec, const size_t& size)
+	void on_write(const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
 		cout << "已传输" << size << "Bytes" << endl;
 	}
@@ -44,13 +47,13 @@ public:
 	void on_accept(asio9::basic_type::ec_type ec, session_ptr session) {
 		if (ec)
 			cerr << ec.message() << endl;
-		cout << "新连接:" << session->getTcpStreamPtr()->socket().remote_endpoint() << endl;
+		cout << "新连接:" << session->get_websocket_stream()->next_layer().socket().remote_endpoint() << endl;
 	};
 };
 
 int main(int argc, char* argv[]) {
 	asio9::basic_type::io_type io;
-	asio9::basic_type::endpoint_type endpoint(boost::asio::ip::make_address("0.0.0.0"), 8880);
+	asio9::basic_type::endpoint_type endpoint(boost::asio::ip::make_address("0.0.0.0"), 8881);
 
 	auto server = std::make_shared<customserver>(&io, endpoint);
 	server->run();

@@ -18,7 +18,7 @@ public:
 
 	}
 
-	void on_message(std::shared_ptr<HttpSession> session, const asio9::basic_type::ec_type& ec, size_t bytes_transferred, asio9::basic_type::req_ptr req)
+	void on_message(const asio9::basic_type::ec_type& ec, size_t bytes_transferred, asio9::basic_type::req_ptr req)
 	{
 		auto res = std::make_shared<asio9::basic_type::res_type>(boost::beast::http::status::ok, req->version());
 		res->set(boost::beast::http::field::server, BOOST_BEAST_VERSION_STRING);
@@ -29,9 +29,9 @@ public:
 		this->write(res);
 	}
 
-	void after_write(std::shared_ptr<HttpSession> session, const asio9::basic_type::ec_type& ec, const size_t& size)
+	void on_write(asio9::basic_type::res_ptr res, const asio9::basic_type::ec_type& ec, const size_t& size)
 	{
-		//cout << "已传输" << size << "Bytes" << endl;
+		cout << "已传输" << size << "Bytes" << endl;
 	}
 };
 
@@ -43,7 +43,7 @@ public:
 	}
 
 	void on_accept(asio9::basic_type::ec_type ec, session_ptr session) {
-		//cout << "新连接:" << session->getTcpStreamPtr()->socket().remote_endpoint() << endl;
+		cout << "新连接:" << session->get_tcp_stream()->socket().remote_endpoint() << endl;
 	};
 };
 
